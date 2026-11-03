@@ -1,0 +1,5 @@
+/* Clean mobile-shell styling */
+:host {
+  display: block;
+  width: 100%;
+}

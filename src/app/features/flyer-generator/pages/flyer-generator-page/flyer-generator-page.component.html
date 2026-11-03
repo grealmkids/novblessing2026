@@ -1,0 +1,52 @@
+<div class="mobile-shell">
+  <!-- Title -->
+  <app-flyer-intro></app-flyer-intro>
+
+  <!-- Name Input -->
+  <app-name-input
+    [currentName]="memberName"
+    (nameChanged)="onNameChanged($event)">
+  </app-name-input>
+
+  <!-- Upload Photo Button -->
+  <app-photo-upload
+    [currentPreviewUrl]="imagePreviewUrl"
+    (photoSelected)="onPhotoSelected($event)"
+    (photoRemoved)="onPhotoRemoved()"
+    (uploadError)="onUploadError($event)">
+  </app-photo-upload>
+
+  <!-- Directional Arrows -->
+  <app-photo-editor
+    [selectedImageUrl]="imagePreviewUrl"
+    [cropConfig]="cropConfig"
+    (cropChanged)="onCropChanged($event)">
+  </app-photo-editor>
+
+  <!-- Flyer Preview -->
+  <app-flyer-preview
+    [photoUrl]="imagePreviewUrl"
+    [memberName]="memberName"
+    [cropConfig]="cropConfig"
+    [isGenerating]="isGenerating">
+  </app-flyer-preview>
+
+  <!-- GENERATE FLIER -->
+  <app-generation-controls
+    [isPhotoUploaded]="isPhotoUploaded"
+    [isNameValid]="isNameValid"
+    [isGenerating]="isGenerating"
+    (generateRequested)="onGenerate()">
+  </app-generation-controls>
+
+  <!-- Download & Share Options -->
+  @if (generatedUrl) {
+    <app-download-panel
+      [generatedUrl]="generatedUrl"
+      [fileName]="generatedFileName"
+      [canShare]="canShare"
+      (downloadRequested)="onDownload()"
+      (shareRequested)="onShare()">
+    </app-download-panel>
+  }
+</div>

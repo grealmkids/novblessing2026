@@ -1,0 +1,10 @@
+<div class="name-field-wrap mb-3">
+  <input
+    type="text"
+    class="name-input"
+    [(ngModel)]="currentName"
+    (ngModelChange)="onInput($event)"
+    [maxLength]="maxLength"
+    placeholder="Name"
+    autocomplete="off">
+</div>

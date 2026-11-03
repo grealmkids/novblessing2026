@@ -1,0 +1,14 @@
+<div class="generate-btn-wrap mb-4">
+  <button
+    type="button"
+    class="btn-generate w-100"
+    [disabled]="isGenerating"
+    (click)="onGenerate()">
+    @if (isGenerating) {
+      <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+      <span>GENERATING...</span>
+    } @else {
+      <span>GENERATE FLIER</span>
+    }
+  </button>
+</div>

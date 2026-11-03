@@ -1,0 +1,33 @@
+<div class="editor-arrows-wrap d-flex justify-content-center align-items-center gap-3 mb-3">
+  <!-- Up Arrow -->
+  <button type="button" class="arrow-btn" (click)="move(0, -18)" title="Move photo up">
+    <svg viewBox="0 0 24 24" class="arrow-svg" fill="none" stroke="#321447" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="12" y1="19" x2="12" y2="5"/>
+      <polyline points="5 12 12 5 19 12"/>
+    </svg>
+  </button>
+
+  <!-- Down Arrow -->
+  <button type="button" class="arrow-btn" (click)="move(0, 18)" title="Move photo down">
+    <svg viewBox="0 0 24 24" class="arrow-svg" fill="none" stroke="#321447" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="12" y1="5" x2="12" y2="19"/>
+      <polyline points="19 12 12 19 5 12"/>
+    </svg>
+  </button>
+
+  <!-- Left Arrow -->
+  <button type="button" class="arrow-btn" (click)="move(-18, 0)" title="Move photo left">
+    <svg viewBox="0 0 24 24" class="arrow-svg" fill="none" stroke="#321447" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="19" y1="12" x2="5" y2="12"/>
+      <polyline points="12 19 5 12 12 5"/>
+    </svg>
+  </button>
+
+  <!-- Right Arrow -->
+  <button type="button" class="arrow-btn" (click)="move(18, 0)" title="Move photo right">
+    <svg viewBox="0 0 24 24" class="arrow-svg" fill="none" stroke="#321447" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="5" y1="12" x2="19" y2="12"/>
+      <polyline points="12 5 19 12 12 19"/>
+    </svg>
+  </button>
+</div>

@@ -1,0 +1,38 @@
+.download-actions-wrap {
+  width: 100%;
+}
+
+.btn-action {
+  height: 50px;
+  border-radius: 12px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-download {
+  background-color: #e9aa26;
+  color: #321447;
+  font-size: 1rem;
+}
+
+.btn-download:hover {
+  background-color: #d8991b;
+}
+
+.btn-share {
+  width: 50px;
+  background-color: #ffffff;
+  color: #4d1f77;
+  border: 2px solid #4d1f77;
+  flex-shrink: 0;
+}
+
+.btn-share:hover {
+  background-color: #f7f3fb;
+}

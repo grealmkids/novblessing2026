@@ -1,0 +1,37 @@
+.generate-btn-wrap {
+  width: 100%;
+}
+
+.btn-generate {
+  height: 56px;
+  background-color: #4d1f77;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(77, 31, 119, 0.25);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-generate:hover:not(:disabled) {
+  background-color: #3b165d;
+  box-shadow: 0 6px 16px rgba(77, 31, 119, 0.35);
+  transform: translateY(-1px);
+}
+
+.btn-generate:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.btn-generate:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
