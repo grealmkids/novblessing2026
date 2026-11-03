@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FlyerIntroComponent } from '../../components/flyer-intro/flyer-intro.component';
 import { PhotoUploadComponent } from '../../components/photo-upload/photo-upload.component';
@@ -30,10 +30,17 @@ import { DEFAULT_CROP_CONFIG } from '../../../../core/constants/flyer-config';
   styleUrl: './flyer-generator-page.component.css'
 })
 export class FlyerGeneratorPageComponent implements OnInit, OnDestroy {
+  @ViewChild(NameInputComponent) nameInputComponent?: NameInputComponent;
+
   selectedImage: File | null = null;
   imagePreviewUrl: string | null = null;
   memberName = '';
   cropConfig: PhotoCropConfig = { ...DEFAULT_CROP_CONFIG };
+
+  hasNameError = false;
+  nameErrorMessage = '';
+  hasPhotoError = false;
+  photoErrorMessage = '';
 
   isGenerating = false;
   generatedBlob: Blob | null = null;
@@ -73,6 +80,8 @@ export class FlyerGeneratorPageComponent implements OnInit, OnDestroy {
 
   async onPhotoSelected(file: File): Promise<void> {
     this.cleanupUrls();
+    this.hasPhotoError = false;
+    this.photoErrorMessage = '';
     this.selectedImage = file;
     this.imagePreviewUrl = URL.createObjectURL(file);
     this.cropConfig = { ...DEFAULT_CROP_CONFIG };
@@ -87,7 +96,8 @@ export class FlyerGeneratorPageComponent implements OnInit, OnDestroy {
   }
 
   onUploadError(errorMsg: string): void {
-    alert(errorMsg);
+    this.hasPhotoError = true;
+    this.photoErrorMessage = errorMsg;
   }
 
   onCropChanged(crop: PhotoCropConfig): void {
@@ -99,12 +109,40 @@ export class FlyerGeneratorPageComponent implements OnInit, OnDestroy {
 
   onNameChanged(name: string): void {
     this.memberName = name;
+    if (this.hasNameError && name.trim().length > 0) {
+      this.hasNameError = false;
+      this.nameErrorMessage = '';
+    }
     if (this.generatedUrl) {
       this.clearGenerated();
     }
   }
 
+  onNameErrorCleared(): void {
+    this.hasNameError = false;
+    this.nameErrorMessage = '';
+  }
+
   async onGenerate(): Promise<void> {
+    const trimmed = this.memberName.trim();
+
+    // 1. Validate Name
+    if (!trimmed) {
+      this.hasNameError = true;
+      this.nameErrorMessage = 'Please enter your name to personalize your flyer';
+      if (this.nameInputComponent) {
+        this.nameInputComponent.focusInput();
+      }
+      return;
+    }
+
+    // 2. Validate Photo
+    if (!this.isPhotoUploaded) {
+      this.hasPhotoError = true;
+      this.photoErrorMessage = 'Please upload a photo for your flyer';
+      return;
+    }
+
     try {
       this.isGenerating = true;
       this.clearGenerated();
@@ -130,18 +168,33 @@ export class FlyerGeneratorPageComponent implements OnInit, OnDestroy {
   }
 
   onDownload(): void {
+    if (!this.memberName.trim()) {
+      this.hasNameError = true;
+      this.nameErrorMessage = 'Please enter your name before downloading';
+      if (this.nameInputComponent) {
+        this.nameInputComponent.focusInput();
+      }
+      return;
+    }
+
     if (!this.generatedBlob) return;
     this.downloadService.downloadBlob(this.generatedBlob, this.generatedFileName);
   }
 
   async onShare(): Promise<void> {
+    if (!this.memberName.trim()) {
+      this.hasNameError = true;
+      this.nameErrorMessage = 'Please enter your name before sharing';
+      return;
+    }
+
     if (!this.generatedBlob) return;
     try {
       const file = new File([this.generatedBlob], this.generatedFileName, { type: 'image/png' });
       await this.downloadService.shareFile(
         file,
         'November Blessing Conference 2026',
-        'I will be Attending November Blessing Conference 2026: Powered Witness (Acts 1:8)!'
+        `I will be Attending November Blessing Conference 2026: Powered Witness (Acts 1:8)! - ${this.memberName}`
       );
     } catch (err) {
       console.warn('Share error:', err);

@@ -2,21 +2,26 @@
   <!-- Title -->
   <app-flyer-intro></app-flyer-intro>
 
-  <!-- Name Input -->
+  <!-- Name Input with Error Validation -->
   <app-name-input
     [currentName]="memberName"
-    (nameChanged)="onNameChanged($event)">
+    [hasError]="hasNameError"
+    [errorMessage]="nameErrorMessage"
+    (nameChanged)="onNameChanged($event)"
+    (errorCleared)="onNameErrorCleared()">
   </app-name-input>
 
-  <!-- Upload Photo Button -->
+  <!-- Upload Photo Button with Error Validation -->
   <app-photo-upload
     [currentPreviewUrl]="imagePreviewUrl"
+    [hasError]="hasPhotoError"
+    [errorMessage]="photoErrorMessage"
     (photoSelected)="onPhotoSelected($event)"
     (photoRemoved)="onPhotoRemoved()"
     (uploadError)="onUploadError($event)">
   </app-photo-upload>
 
-  <!-- Directional Arrows -->
+  <!-- Directional Arrows & Zoom Slider -->
   <app-photo-editor
     [selectedImageUrl]="imagePreviewUrl"
     [cropConfig]="cropConfig"

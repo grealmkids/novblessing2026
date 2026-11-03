@@ -1,10 +1,23 @@
 <div class="name-field-wrap mb-3">
   <input
+    #inputElement
     type="text"
     class="name-input"
+    [class.input-error]="hasError"
     [(ngModel)]="currentName"
     (ngModelChange)="onInput($event)"
     [maxLength]="maxLength"
     placeholder="Name"
     autocomplete="off">
+
+  @if (hasError) {
+    <div class="name-error-message d-flex align-items-center justify-content-center gap-1 mt-2">
+      <svg viewBox="0 0 24 24" class="error-svg" fill="none" stroke="#dc3545" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      <span>{{ errorMessage || 'Please enter your name first' }}</span>
+    </div>
+  }
 </div>

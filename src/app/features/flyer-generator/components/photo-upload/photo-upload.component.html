@@ -6,15 +6,20 @@
     accept="image/jpeg,image/png,image/webp"
     (change)="onFileSelected($event)">
 
-  <div class="upload-btn-card d-flex align-items-center" (click)="triggerFileInput()" role="button" tabindex="0">
+  <div
+    class="upload-btn-card d-flex align-items-center"
+    [class.upload-card-error]="hasError && !currentPreviewUrl"
+    (click)="triggerFileInput()"
+    role="button"
+    tabindex="0">
     <!-- Left badge icon: Photo icon or user thumbnail -->
     <div class="left-icon-container">
       @if (currentPreviewUrl) {
         <img [src]="currentPreviewUrl" alt="Thumbnail" class="user-thumb">
       } @else {
-        <div class="photo-badge">
+        <div class="photo-badge" [class.badge-error]="hasError">
           <!-- Add image SVG icon -->
-          <svg viewBox="0 0 24 24" class="svg-photo" fill="none" stroke="#4d1f77" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg viewBox="0 0 24 24" class="svg-photo" fill="none" [attr.stroke]="hasError ? '#dc3545' : '#4d1f77'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
             <circle cx="8.5" cy="8.5" r="1.5"/>
             <polyline points="21 15 16 10 5 21"/>
@@ -27,12 +32,12 @@
 
     <!-- Center/Right: Cloud Icon & "Upload photo" text -->
     <div class="center-content d-flex align-items-center justify-content-center gap-2 flex-grow-1">
-      <svg viewBox="0 0 24 24" class="cloud-upload-svg" fill="none" stroke="#4d1f77" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+      <svg viewBox="0 0 24 24" class="cloud-upload-svg" fill="none" [attr.stroke]="hasError && !currentPreviewUrl ? '#dc3545' : '#4d1f77'" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
         <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>
         <polyline points="12 13 12 7 9 10"/>
         <polyline points="12 7 15 10"/>
       </svg>
-      <span class="upload-label">{{ currentPreviewUrl ? 'Change photo' : 'Upload your photo' }}</span>
+      <span class="upload-label" [class.text-error]="hasError && !currentPreviewUrl">{{ currentPreviewUrl ? 'Change photo' : 'Upload photo' }}</span>
     </div>
 
     <!-- Optional remove photo icon when loaded -->
@@ -45,4 +50,15 @@
       </button>
     }
   </div>
+
+  @if (hasError && !currentPreviewUrl) {
+    <div class="photo-error-message d-flex align-items-center justify-content-center gap-1 mt-2">
+      <svg viewBox="0 0 24 24" class="error-svg" fill="none" stroke="#dc3545" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      <span>{{ errorMessage || 'Please upload a photo first' }}</span>
+    </div>
+  }
 </div>

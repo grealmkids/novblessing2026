@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -12,10 +12,25 @@ import { FormsModule } from '@angular/forms';
 export class NameInputComponent {
   @Input() currentName = '';
   @Input() maxLength = 40;
+  @Input() hasError = false;
+  @Input() errorMessage = '';
 
   @Output() nameChanged = new EventEmitter<string>();
+  @Output() errorCleared = new EventEmitter<void>();
+
+  @ViewChild('inputElement') inputRef!: ElementRef<HTMLInputElement>;
 
   onInput(value: string): void {
+    if (this.hasError) {
+      this.hasError = false;
+      this.errorCleared.emit();
+    }
     this.nameChanged.emit(value);
+  }
+
+  focusInput(): void {
+    if (this.inputRef) {
+      this.inputRef.nativeElement.focus();
+    }
   }
 }

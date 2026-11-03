@@ -12,6 +12,8 @@ import { ImageUploadService } from '../../../../core/services/image-upload.servi
 export class PhotoUploadComponent {
   @Input() currentPreviewUrl: string | null = null;
   @Input() isLoading = false;
+  @Input() hasError = false;
+  @Input() errorMessage = '';
 
   @Output() photoSelected = new EventEmitter<File>();
   @Output() photoRemoved = new EventEmitter<void>();
@@ -38,6 +40,7 @@ export class PhotoUploadComponent {
   private async processFile(file: File): Promise<void> {
     const result = await this.imageUploadService.validateAndLoadImage(file);
     if (result.valid && result.file) {
+      this.hasError = false;
       this.photoSelected.emit(result.file);
     } else {
       this.uploadError.emit(result.error || 'Invalid photograph format.');
