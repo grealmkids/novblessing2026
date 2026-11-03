@@ -26,15 +26,24 @@ export class PhotoEditorComponent {
     this.cropChanged.emit(this.cropConfig);
   }
 
+  onZoomChange(zoom: number): void {
+    const val = Math.min(3.0, Math.max(0.6, Math.round(zoom * 100) / 100));
+    this.cropConfig = { ...this.cropConfig, zoom: val };
+    this.cropChanged.emit(this.cropConfig);
+  }
+
+  onSliderInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.onZoomChange(parseFloat(input.value));
+  }
+
   zoomIn(): void {
     const nextZoom = Math.min(3.0, Math.round((this.cropConfig.zoom + 0.1) * 10) / 10);
-    this.cropConfig = { ...this.cropConfig, zoom: nextZoom };
-    this.cropChanged.emit(this.cropConfig);
+    this.onZoomChange(nextZoom);
   }
 
   zoomOut(): void {
     const nextZoom = Math.max(0.6, Math.round((this.cropConfig.zoom - 0.1) * 10) / 10);
-    this.cropConfig = { ...this.cropConfig, zoom: nextZoom };
-    this.cropChanged.emit(this.cropConfig);
+    this.onZoomChange(nextZoom);
   }
 }
