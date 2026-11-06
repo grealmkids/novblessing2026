@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
 
 export interface VisitorStats {
-  total: number;
-  today: number;
+  uniqueVisitors: number;   // First-time unique individuals
+  returnVisitors: number;   // Return visits from past visitors
+  todayVisitors: number;    // Unique people who visited today
+  totalVisits: number;      // Total visits (unique + returning)
 }
 
 @Injectable({
@@ -10,105 +12,144 @@ export interface VisitorStats {
 })
 export class VisitorCounterService {
   private readonly BASE_URL = 'https://countapi.mileshilliard.com/api/v1';
-  private readonly TOTAL_KEY = 'chministries-nbc2026-total-visitors';
-  private readonly SESSION_STORAGE_KEY = 'nbc2026_visit_recorded';
-  private readonly LOCAL_TOTAL_CACHE = 'nbc2026_cached_total';
-  private readonly LOCAL_TODAY_CACHE = 'nbc2026_cached_today';
+
+  // Distinct namespace keys for accurate conference tracking
+  private readonly KEY_UNIQUE = 'chministries-nbc2026-unique-v3';
+  private readonly KEY_RETURNING = 'chministries-nbc2026-returning-v3';
+
+  // Browser storage keys
+  private readonly LS_FIRST_VISIT = 'nbc2026_first_visit_flag';
+  private readonly SS_SESSION_LOGGED = 'nbc2026_session_active';
+  private readonly LS_STATS_CACHE = 'nbc2026_stats_cache';
 
   private cachedStats: VisitorStats = {
-    total: 1,
-    today: 1
+    uniqueVisitors: 1,
+    returnVisitors: 0,
+    todayVisitors: 1,
+    totalVisits: 1
   };
 
   constructor() {
-    this.loadFromLocalCache();
+    this.loadFromCache();
     this.recordVisit();
   }
 
   /**
-   * Format today's date string: YYYY-MM-DD
+   * Generates a date-stamped key for daily unique tracking (YYYY-MM-DD)
    */
   private getTodayKey(): string {
     const now = new Date();
     const year = now.getFullYear();
     const month = String(now.getMonth() + 1).padStart(2, '0');
     const day = String(now.getDate()).padStart(2, '0');
-    return `chministries-nbc2026-daily-${year}-${month}-${day}`;
+    return `chministries-nbc2026-daily-v3-${year}-${month}-${day}`;
   }
 
-  private loadFromLocalCache(): void {
+  private loadFromCache(): void {
     if (typeof localStorage === 'undefined') return;
     try {
-      const savedTotal = localStorage.getItem(this.LOCAL_TOTAL_CACHE);
-      const savedToday = localStorage.getItem(this.LOCAL_TODAY_CACHE);
-      if (savedTotal) this.cachedStats.total = parseInt(savedTotal, 10) || 1;
-      if (savedToday) this.cachedStats.today = parseInt(savedToday, 10) || 1;
+      const saved = localStorage.getItem(this.LS_STATS_CACHE);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed && typeof parsed.uniqueVisitors === 'number') {
+          this.cachedStats = parsed;
+        }
+      }
     } catch {
-      // Ignore storage access errors
+      // Ignore cache parsing errors
     }
   }
 
-  private saveToLocalCache(stats: VisitorStats): void {
+  private saveToCache(stats: VisitorStats): void {
     if (typeof localStorage === 'undefined') return;
     try {
-      localStorage.setItem(this.LOCAL_TOTAL_CACHE, stats.total.toString());
-      localStorage.setItem(this.LOCAL_TODAY_CACHE, stats.today.toString());
+      localStorage.setItem(this.LS_STATS_CACHE, JSON.stringify(stats));
     } catch {
-      // Ignore storage access errors
+      // Ignore storage errors
     }
   }
 
   /**
-   * Record visit once per browser session
+   * Tracks visitors accurately:
+   * 1. Refreshing the browser NEVER increments any counter.
+   * 2. First-time visitors are recorded once per device/browser.
+   * 3. Returning visitors are recorded once per new session.
+   * 4. Daily visitors are recorded once per day per device.
    */
   public async recordVisit(): Promise<void> {
-    if (typeof sessionStorage === 'undefined') return;
+    if (typeof localStorage === 'undefined' || typeof sessionStorage === 'undefined') return;
 
     try {
-      const alreadyRecorded = sessionStorage.getItem(this.SESSION_STORAGE_KEY);
+      const isFirstTimeEver = !localStorage.getItem(this.LS_FIRST_VISIT);
+      const isSessionAlreadyLogged = sessionStorage.getItem(this.SS_SESSION_LOGGED);
       const todayKey = this.getTodayKey();
+      const isLoggedToday = localStorage.getItem(`nbc2026_day_${todayKey}`);
 
-      if (!alreadyRecorded) {
-        sessionStorage.setItem(this.SESSION_STORAGE_KEY, 'true');
+      // SCENARIO 1: First-Time Visitor
+      if (isFirstTimeEver) {
+        localStorage.setItem(this.LS_FIRST_VISIT, new Date().toISOString());
+        sessionStorage.setItem(this.SS_SESSION_LOGGED, 'true');
+        localStorage.setItem(`nbc2026_day_${todayKey}`, 'true');
 
-        // Increment both total and daily counter
-        const [totalRes, todayRes] = await Promise.allSettled([
-          this.fetchHit(this.TOTAL_KEY),
+        // Increment Unique First-Time count and Today count
+        await Promise.allSettled([
+          this.fetchHit(this.KEY_UNIQUE),
           this.fetchHit(todayKey)
         ]);
+      } else {
+        // SCENARIO 2: Returning visitor or browser refresh.
+        // If the session is already active, user simply hit REFRESH (F5).
+        // DO NOT INCREMENT ANYTHING ON REFRESH!
+        if (!isSessionAlreadyLogged) {
+          // This is a NEW session by a RETURNING visitor
+          sessionStorage.setItem(this.SS_SESSION_LOGGED, 'true');
 
-        if (totalRes.status === 'fulfilled' && totalRes.value > 0) {
-          this.cachedStats.total = totalRes.value;
-        }
-        if (todayRes.status === 'fulfilled' && todayRes.value > 0) {
-          this.cachedStats.today = todayRes.value;
-        }
+          const calls: Promise<number>[] = [this.fetchHit(this.KEY_RETURNING)];
 
-        this.saveToLocalCache(this.cachedStats);
+          // If visiting for the first time today, also count in today's unique visitors
+          if (!isLoggedToday) {
+            localStorage.setItem(`nbc2026_day_${todayKey}`, 'true');
+            calls.push(this.fetchHit(todayKey));
+          }
+
+          await Promise.allSettled(calls);
+        }
       }
+
+      // Fetch fresh stats to update cache
+      await this.getStats();
     } catch (err) {
-      console.warn('Could not record visit counter:', err);
+      console.warn('Could not record visit:', err);
     }
   }
 
   /**
-   * Fetch current stats for the popup modal
+   * Fetches latest stats without incrementing
    */
   public async getStats(): Promise<VisitorStats> {
     const todayKey = this.getTodayKey();
 
     try {
-      const [totalVal, todayVal] = await Promise.all([
-        this.fetchGet(this.TOTAL_KEY),
+      const [uniqueVal, returnVal, todayVal] = await Promise.all([
+        this.fetchGet(this.KEY_UNIQUE),
+        this.fetchGet(this.KEY_RETURNING),
         this.fetchGet(todayKey)
       ]);
 
-      if (totalVal > 0) this.cachedStats.total = totalVal;
-      if (todayVal > 0) this.cachedStats.today = todayVal;
+      const unique = uniqueVal > 0 ? uniqueVal : (this.cachedStats.uniqueVisitors || 1);
+      const returning = returnVal >= 0 ? returnVal : (this.cachedStats.returnVisitors || 0);
+      const today = todayVal > 0 ? todayVal : (this.cachedStats.todayVisitors || 1);
 
-      this.saveToLocalCache(this.cachedStats);
+      this.cachedStats = {
+        uniqueVisitors: unique,
+        returnVisitors: returning,
+        todayVisitors: today,
+        totalVisits: unique + returning
+      };
+
+      this.saveToCache(this.cachedStats);
     } catch {
-      // Fallback to cached stats
+      // Return cached stats on failure
     }
 
     return { ...this.cachedStats };
@@ -137,4 +178,3 @@ export class VisitorCounterService {
     }
   }
 }
-

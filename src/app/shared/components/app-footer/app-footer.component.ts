@@ -1,6 +1,6 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
-import { VisitorCounterService } from '../../../core/services/visitor-counter.service';
+import { VisitorCounterService, VisitorStats } from '../../../core/services/visitor-counter.service';
 
 @Component({
   selector: 'app-footer',
@@ -12,13 +12,16 @@ import { VisitorCounterService } from '../../../core/services/visitor-counter.se
 export class AppFooterComponent {
   isModalOpen = false;
   isLoading = false;
+
+  uniqueVisitors = 0;
+  returnVisitors = 0;
+  todayVisitors = 0;
   totalVisits = 0;
-  todayVisits = 0;
 
   constructor(private counterService: VisitorCounterService) {}
 
   async openVisitorModal(): Promise<void> {
-    const inputPassword = window.prompt('Enter password:');
+    const inputPassword = window.prompt('Enter password to view analytics:');
     if (inputPassword === null) {
       return;
     }
@@ -32,9 +35,11 @@ export class AppFooterComponent {
     this.isLoading = true;
 
     try {
-      const stats = await this.counterService.getStats();
-      this.totalVisits = stats.total;
-      this.todayVisits = stats.today;
+      const stats: VisitorStats = await this.counterService.getStats();
+      this.uniqueVisitors = stats.uniqueVisitors;
+      this.returnVisitors = stats.returnVisitors;
+      this.todayVisitors = stats.todayVisitors;
+      this.totalVisits = stats.totalVisits;
     } finally {
       this.isLoading = false;
     }
