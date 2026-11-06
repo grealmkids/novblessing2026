@@ -4,3 +4,179 @@
   font-size: 0.75rem;
   letter-spacing: 0.5px;
 }
+
+/* Hidden Discreet Stats Button */
+.btn-hidden-stats {
+  background: transparent;
+  border: none;
+  color: #8f8599;
+  opacity: 0.22;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s ease;
+  outline: none;
+}
+
+.btn-hidden-stats:hover {
+  opacity: 0.85;
+  background-color: rgba(77, 31, 119, 0.08);
+  color: #4d1f77;
+  transform: scale(1.1);
+}
+
+.stats-icon {
+  width: 18px;
+  height: 18px;
+}
+
+/* Modal Backdrop */
+.visitor-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(30, 10, 45, 0.55);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: fadeIn 0.2s ease-out;
+}
+
+/* Centered Dialog */
+.visitor-modal-dialog {
+  background: #ffffff;
+  width: 100%;
+  max-width: 360px;
+  border-radius: 20px;
+  padding: 24px;
+  position: relative;
+  box-shadow: 0 16px 40px rgba(50, 20, 71, 0.25);
+  border: 1px solid rgba(77, 31, 119, 0.12);
+  animation: scaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Close button on top-right */
+.btn-close-modal {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: #f4ecfa;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #4d1f77;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.btn-close-modal:hover {
+  background: #4d1f77;
+  color: #ffffff;
+}
+
+/* Header Content */
+.stats-badge {
+  background: #f4ecfa;
+  color: #4d1f77;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  padding: 3px 10px;
+  border-radius: 9999px;
+}
+
+.live-dot {
+  width: 7px;
+  height: 7px;
+  background: #198754;
+  border-radius: 50%;
+  display: inline-block;
+  box-shadow: 0 0 0 2px rgba(25, 135, 84, 0.25);
+}
+
+.modal-title {
+  color: #321447;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+}
+
+/* Stat Cards */
+.stat-card {
+  background: #f9f7fc;
+  border: 1px solid #ebdcf5;
+  transition: transform 0.2s ease;
+}
+
+.stat-card.stat-today {
+  background: #fffdf7;
+  border-color: #f7e4b2;
+}
+
+.stat-value {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1.85rem;
+  font-weight: 800;
+  line-height: 1.1;
+  color: #4d1f77;
+  margin-bottom: 4px;
+}
+
+.stat-value.text-gold {
+  color: #e9aa26 !important;
+}
+
+.text-purple {
+  color: #4d1f77 !important;
+}
+
+.stat-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #796c88;
+  letter-spacing: 0.2px;
+}
+
+/* Dismiss Button */
+.btn-dismiss-modal {
+  height: 44px;
+  background: #4d1f77;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-dismiss-modal:hover {
+  background: #39135a;
+  transform: translateY(-1px);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleUp {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
+}
