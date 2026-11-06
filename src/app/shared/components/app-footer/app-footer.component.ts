@@ -18,6 +18,16 @@ export class AppFooterComponent {
   constructor(private counterService: VisitorCounterService) {}
 
   async openVisitorModal(): Promise<void> {
+    const inputPassword = window.prompt('Enter password:');
+    if (inputPassword === null) {
+      return;
+    }
+
+    if (inputPassword !== 'JesusChrist') {
+      window.alert('Incorrect password.');
+      return;
+    }
+
     this.isModalOpen = true;
     this.isLoading = true;
 
